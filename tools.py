@@ -31,6 +31,25 @@ class CalculatorTool:
             return SAFE_OPS[type(node.op)](self._eval_node(node.operand))
         raise ValueError(f"Unsupported expression: {ast.dump(node)}")
 
+    def get_schema(self):
+        return {
+            "type": "function",
+            "function": {
+                "name": "calculator",
+                "description": self.description,
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "expression": {
+                            "type": "string",
+                            "description": "A mathematical expression to evaluate, e.g. '2 + 3 * 4'",
+                        }
+                    },
+                    "required": ["expression"],
+                },
+            },
+        }
+
     def calculate(self, expression: str) -> dict | str:
         """Evaluate a mathematical expression and return the result."""
         try:

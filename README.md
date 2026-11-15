@@ -1,15 +1,18 @@
 # MCP Agent with Short-Term Memory
 
-A minimal AI agent that demonstrates conversational short-term memory using the OpenRouter API.
+A minimal AI agent that demonstrates conversational short-term memory and tool use via the OpenRouter API.
 
 ## What it does
 
-The agent maintains a message history across turns so it can reference earlier parts of the conversation. This lets it handle follow-up questions that depend on prior context -- for example, tracking how many apples you have after eating one.
+The agent maintains a message history across turns so it can reference earlier parts of the conversation. This lets it handle follow-up questions that depend on prior context -- for example, tracking how many apples you have after eating one. It can also call tools (like a calculator) when the model decides it needs one.
 
-Two chat modes are available:
+Three agent classes are available, each building on the previous:
 
-- **Stateless** (`agent.chat()`) -- each message is independent, no memory of prior turns.
-- **Short-term memory** (`agent.chat_short_memory()`) -- accumulates the conversation history and sends it with every request.
+- **`Agent`** -- stateless, each message is independent, no memory of prior turns.
+- **`Agent_short_memory`** -- accumulates conversation history and sends it with every request.
+- **`Agent_short_memory_tools`** -- adds tool support (e.g. calculator). Tools are passed in at creation and their schemas are sent to the model.
+
+`RunAgent` orchestrates the tool-call loop: it calls the agent, executes any tool calls the model requests, feeds results back, and repeats -- up to a configurable `max_turns` limit.
 
 ## Setup
 
@@ -33,12 +36,14 @@ Two chat modes are available:
 python main.py
 ```
 
-This runs a demo that asks two related questions and prints the reasoning and answer for each.
+This runs a demo that asks a few questions (including a math question that triggers the calculator tool) and prints the raw model response for each turn.
 
 ## Project structure
 
 ```
-main.py              -- Agent class with stateless and memory-enabled chat
+main.py              -- Agent classes (Agent, Agent_short_memory, Agent_short_memory_tools)
+run_agent.py         -- RunAgent class that orchestrates the tool-call loop
+tools.py             -- Tool definitions (CalculatorTool with get_schema())
 agent_response.py    -- AgentResponse dataclass for structured output
 .env                 -- API key (not committed)
 ```
