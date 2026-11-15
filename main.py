@@ -104,16 +104,17 @@ class Agent_short_memory_tools(Agent_short_memory):
 
         return response
     
-calculator = CalculatorTool()
-
 if __name__ == "__main__":
-    #agent = Agent()
-    #agent_short_memory = Agent_short_memory()
-    agent_short_memory_tools = Agent_short_memory_tools(tools=[calculator])
-    
-    #response = calculator.calculate("157.09 * 493.89")
-    #print(response)
+    import argparse
 
+    parser = argparse.ArgumentParser(description="Run an AI agent via OpenRouter")
+    parser.add_argument(
+        "--agent",
+        choices=["basic", "memory", "tools"],
+        default="basic",
+        help="Which agent to use (default: basic)",
+    )
+    args = parser.parse_args()
 
     questions = [
         "I have 4 apples. How many do you have?",
@@ -121,10 +122,24 @@ if __name__ == "__main__":
         "What is 157.09 * 493.89?"
     ]
 
-    runner = RunAgent(agent_short_memory_tools, max_turns=5)
+    if args.agent == "basic":
+        agent = Agent()
+        for question in questions:
+            response = AgentResponse.from_completion(question, agent.chat(question))
+            print(response)
 
-    for question in questions:
-        raw = runner.run(question)
-        for field, value in raw:
-            print((field, value))
+    elif args.agent == "memory":
+        agent = Agent_short_memory()
+        for question in questions:
+            response = AgentResponse.from_completion(question, agent.chat(question))
+            print(response)
+
+    elif args.agent == "tools":
+        calculator = CalculatorTool()
+        agent = Agent_short_memory_tools(tools=[calculator])
+        runner = RunAgent(agent, max_turns=5)
+        for question in questions:
+            raw = runner.run(question)
+            for field, value in raw:
+                print((field, value))
     

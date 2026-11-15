@@ -33,10 +33,12 @@ Three agent classes are available, each building on the previous:
 ## Usage
 
 ```
-python main.py
+python main.py --agent basic    # stateless agent, no memory
+python main.py --agent memory   # agent with short-term memory
+python main.py --agent tools    # memory + tool use (calculator)
 ```
 
-This runs a demo that asks a few questions (including a math question that triggers the calculator tool) and prints the raw model response for each turn.
+The `--agent` flag selects which agent to run (defaults to `basic`). Each mode runs a short demo conversation that asks a few questions and prints the model's responses. The `tools` mode includes a math question that triggers the calculator tool.
 
 ## Project structure
 
