@@ -31,6 +31,7 @@ class Agent:
         #self.model = "anthropic/claude-sonnet-4.6"
         self.model = "ling-3.2-flash:free"
         self.system_message = "You are a helpful assistant that breaks down problems into steps and solves them systematically."
+        self.messages = []
         
     def chat(self, message):
         """Process a user message and return a response"""
@@ -48,18 +49,8 @@ class Agent:
 
         return response
 
-class Agent_short_memory:
-    """A simple AI agent that can answer questions (via OpenRouter)"""
-
-    def __init__(self):
-        self.client = OpenAI(
-            base_url="https://openrouter.ai/api/v1",
-            api_key=os.getenv("OPENROUTER_API_KEY"),
-        )
-        #self.model = "anthropic/claude-sonnet-4.6"
-        self.model = "ling-3.2-flash:free"
-        self.system_message = "You are a helpful assistant that breaks down problems into steps and solves them systematically."
-        self.messages = [] # short-term memory
+class Agent_short_memory(Agent):
+    """A simple AI agent that can answer questions (via OpenRouter) with short-term memory of previous messages in the conversation"""
 
     def chat(self, message):
         """Process a user message and return a response with a short-term memory"""
@@ -78,6 +69,26 @@ class Agent_short_memory:
 
         return response
 
+class Agent_short_memory_tools(Agent_short_memory):
+    """A simple AI agent that can answer questions (via OpenRouter) with short-term memory of previous messages in the conversation that have access to tools"""
+
+    def chat(self, message):
+        """Process a user message and return a response with a short-term memory"""
+
+        self.messages.append({"role": "user", "content": message})
+
+        response = self.client.chat.completions.create(
+            model=self.model,
+            max_tokens=1024,
+            messages=[{"role": "system", "content": self.system_message}] + self.messages,
+            extra_body={"reasoning": {"enabled": True}},
+            temperature=0.1,
+        )
+
+        self.messages.append({"role": "assistant", "content": response.choices[0].message.content})
+
+        return response
+    
 calculator = CalculatorTool()
 
 if __name__ == "__main__":
