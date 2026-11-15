@@ -42,3 +42,9 @@ main.py              -- Agent class with stateless and memory-enabled chat
 agent_response.py    -- AgentResponse dataclass for structured output
 .env                 -- API key (not committed)
 ```
+
+## References
+
+- [Build an AI Agent from Scratch in Python](https://www.leoniemonigatti.com/blog/ai-agent-from-scratch-in-python.html) -- the tutorial this project is based on
+- [OpenRouter API docs](https://openrouter.ai/docs/quickstart)
+- [OpenAI Python client](https://github.com/openai/openai-python) -- used here as an OpenRouter-compatible HTTP client
